@@ -1,30 +1,61 @@
-from paramiko import paramiko.client.SSHClient
+from paramiko import SSHClient
 from config import *
+import sys
+import http.client
+import json
 
 def begin():
+	print('Initialize connection to Ansible server...')
+	pkey_pass= input('Enter pkey pass > ')
+	ssh = SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	ssh.connect(ans_server, password=pkey_pass, pkey=priv_key_file)
 	print(menu)
 	choice = input('> ')
-	if choice == 1:
-		run_ans()
+	if choice == '1':
+		run_ans(ssh)
+	elif choice == '2':
+		list_plays(ssh)
+	elif choice == '3':
+		get_inventory()
+	elif choice == '4':
+		sys.exit()
 
-def run_ans(): #This needs to be split up playbook... maybe
+def run_ans(ssh): #This needs to be split up playbook... maybe
 	try:
 		playbook = input('Enter playbook name > ')
 		computer = input('Enter address of target > ')
-		pcname = input('Enter the name ')
-		pkey_pass= input('Enter pkey > ')
-		ssh = SSHClient()
-		ssh.connect(ans_server, password=pkey_pass, pkey=priv_key_file)
-		stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} --extra-vars "hosts={host} host_name={name}"'.format(playbook=playbook, hosts=computer, name=pcname))
+		pcname = input('Enter the desired name of the target machine > ')
+		stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass'.format(playbook=playbook, hosts=computer, name=pcname))
+		stdin.write(password)
+		stdin.flush()
 		print(stdout.rstrip('\n'))
+		begin()
 	except paramiko.client.SSHException:
 		print('Error Establishing connection...')
 	except paramiko.client.AuthenticationException:
 		print('Auth Error...')
 
-def list_ans():
+def list_plays(ssh):
+	stdin, stdout, stderr = ssh.exec_command('ls *.yml *.yaml')
+	if (str(stderr.read())) > 5:
+		print('No playbooks detected...')
+	else:
+		print(str(stdout))
+	begin()
 
 
+def get_inventory():#replace with requests
+	sensu = http.client.HTTPConnection(monitoring_location)
+	sensu.request('GET','/clients')
+	clients = sensu.getresponse()
+	clients = json.loads(clients.read(len(http_response_str)))
+	print(clients['name'])
+	begin()
+
+#might turn into
 def ssh_connect():
 	ssh = SSHClient()
 	ssh.connect(ans_server, password=pkey_pass, pkey=priv_key_file)
+
+begin()
