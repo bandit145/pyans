@@ -1,7 +1,8 @@
+!#/usr/bin/env python3
 from paramiko import SSHClient
 from config import *
 import sys
-import http.client
+import requests
 import json
 
 def begin():
@@ -46,10 +47,8 @@ def list_plays(ssh):
 
 
 def get_inventory():#replace with requests
-	sensu = http.client.HTTPConnection(monitoring_location)
-	sensu.request('GET','/clients')
-	clients = sensu.getresponse()
-	clients = json.loads(clients.read(len(http_response_str)))
+	data = requests.get(monitoring_location)
+	clients = data.json()
 	print(clients['name'])
 	begin()
 
