@@ -3,9 +3,9 @@
 import paramiko
 from config import *
 import sys
-import http.client
 import json
 import getpass
+import http.client
 
 def begin():
 	print('Initialize connection to Ansible server...')
@@ -48,7 +48,6 @@ def list_plays(ssh):
 
 def get_inventory():#replace with requests
 	sensu = http.client.HTTPConnection(monitoring_location)
-	sensu.request('GET','/clients')
 	clients = sensu.getresponse()
 	clients = json.loads(clients.readall().decode('utf-8'))
 	for client in clients:
