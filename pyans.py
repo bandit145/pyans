@@ -2,10 +2,14 @@
 #TODO: add error handling
 import paramiko
 from config import *
+from playbooks import *
 import sys
 import json
 import getpass
 import http.client
+books = {#function names go here 
+	'server_deploy': server_deploy
+}
 login = 0
 pkey_pass = 0 
 def begin():
@@ -28,21 +32,16 @@ def begin():
 
 def run_ans(ssh): #This needs to be split up playbook... maybe
 	try:
-		playbook = input('Enter playbook name > ')
-		computer = input('Enter address of target > ')
-		pcname = input('Enter the desired name of the target machine > ')
-		password = getpass.getpass('Enter become pass > ')
-		stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
-		stdin.write(password+'\n')
-		stdin.flush()
-		output = stdout.readlines()
-		for line in output:
-			print(line)
+		choice = input('Enter playbook you would like to deploy > ')
+		books[choice]()
 		begin()
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
 	except paramiko.AuthenticationException:
 		print('Auth Error...')
+	except KeyError:
+		print('No playbook by that name...')
+		begin()
 
 def list_plays(ssh): #lists plays
 	stdin, stdout, stderr = ssh.exec_command('ls *.yml *.yaml')
