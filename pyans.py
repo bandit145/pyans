@@ -33,7 +33,7 @@ def begin():
 def run_ans(ssh): #This needs to be split up playbook... maybe
 	try:
 		choice = input('Enter playbook you would like to deploy > ')
-		books[choice]()
+		books[choice](ssh)
 		begin()
 	except paramiko.SSHException:
 		print('Error Establishing connection...')

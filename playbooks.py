@@ -1,9 +1,10 @@
 #File contains functions for the different playbooks added
 #to the enviroment
 #
-
-def server_deploy(): #for base serverdeploy.yml playbook
-	playbook = input('Enter playbook name > ')
+from config import pkey_location
+import getpass
+def server_deploy(ssh): #for base serverdeploy.yml playbook
+	playbook = 'serverdeploy.yml' #name of book on server
 	computer = input('Enter address of target > ')
 	pcname = input('Enter the desired name of the target machine > ')
 	password = getpass.getpass('Enter become pass > ')
