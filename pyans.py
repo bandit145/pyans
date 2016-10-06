@@ -63,7 +63,7 @@ def ssh_connect(key):
 	global login
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	ssh.connect(ans_server, password=pkey_pass, pkey=key)
+	ssh.connect(ans_server,username=username, pkey=key)
 	#user becomes logged in
 	login = 1
 	return ssh

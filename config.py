@@ -6,6 +6,7 @@ menu = '''
 [>]4.EXIT                  [<]
          	'''
 server_pass=''
+username='phil'
 ans_server='ansible-ubuntu.meme.com'
 priv_key_file='puttyansible'
 ans_playbooklocation='/home/server/'
