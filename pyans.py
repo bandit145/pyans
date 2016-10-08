@@ -8,11 +8,13 @@ import json
 import getpass
 import http.client
 books = {#function names go here 
-	'server_deploy': server_deploy
+	'server_deploy': server_deploy,
+	'jenkins_server': jenkins_server
 }
 login = 0
 pkey_pass = 0 
-def begin():
+ssh=0
+def begin(ssh):
 	if login == 0:
 		print(login)
 		print('Initialize connection to Ansible server...')
@@ -26,7 +28,7 @@ def begin():
 	elif choice == '2':
 		list_plays(ssh)
 	elif choice == '3':
-		get_inventory()
+		get_inventory(ssh)
 	elif choice == '4':
 		sys.exit()
 
@@ -34,29 +36,29 @@ def run_ans(ssh): #This needs to be split up playbook... maybe
 	try:
 		choice = input('Enter playbook you would like to deploy > ')
 		books[choice](ssh)
-		begin()
+		begin(ssh)
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
 	except paramiko.AuthenticationException:
 		print('Auth Error...')
 	except KeyError:
 		print('No playbook by that name...')
-		begin()
+		begin(ssh)
 
 def list_plays(ssh): #lists plays
 	stdin, stdout, stderr = ssh.exec_command('ls *.yml *.yaml')
-	print(stdout.read())
-	begin()
+	print(stdout.readlines())
+	begin(ssh)
 
 
-def get_inventory(): # connects to sensu and gets servers
+def get_inventory(ssh): # connects to sensu and gets servers
 	sensu = http.client.HTTPConnection(monitoring_location)
 	sensu.request('GET','/clients')
 	clients = sensu.getresponse()
 	clients = json.loads(clients.readall().decode('utf-8'))
 	for client in clients:
 		print(client['name']+' - '+ client['address'])
-	begin()
+	begin(ssh)
 
 
 def ssh_connect(key):
@@ -68,4 +70,4 @@ def ssh_connect(key):
 	login = 1
 	return ssh
 
-begin()
+begin(ssh)
