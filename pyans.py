@@ -7,16 +7,19 @@ import sys
 import json
 import getpass
 import http.client
+import subprocess
+import time
 books = {#function names go here 
-	'server_deploy': server_deploy,
-	'jenkins_server': jenkins_server
+	'server_deploy': [server_deploy,'linux'],
+	'jenkins_server': [jenkins_server,'linux']
 }
+
+
 login = 0
 pkey_pass = 0 
 ssh=0
 def begin(ssh):
 	if login == 0:
-		print(login)
 		print('Initialize connection to Ansible server...')
 		pkey_pass= getpass.getpass('Enter pkey pass > ')
 		key = paramiko.RSAKey(filename=priv_key_file, password=pkey_pass)
@@ -24,7 +27,7 @@ def begin(ssh):
 	print(menu)
 	choice = input('> ')
 	if choice == '1':
-		run_ans(ssh)
+		run_ans(ssh, content)
 	elif choice == '2':
 		list_plays(ssh)
 	elif choice == '3':
@@ -32,10 +35,11 @@ def begin(ssh):
 	elif choice == '4':
 		sys.exit()
 
-def run_ans(ssh): #This needs to be split up playbook... maybe
+def run_ans(ssh): #going to become "deployment function"
 	try:
-		choice = input('Enter playbook you would like to deploy > ')
-		books[choice](ssh)
+		choice = raw_input('Enter playbook you would like to deploy > ')
+		name = new_vm(books[choice][1])
+		books[choice][0](ssh,name)
 		begin(ssh)
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
@@ -69,5 +73,13 @@ def ssh_connect(key):
 	#user becomes logged in
 	login = 1
 	return ssh
+
+def new_vm():#keep ip address together with ansible
+	name = raw_input('Enter computer name > ')
+	template = raw_input('Enter template from vcenter > ')
+	subprocess.call(['./vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name])
+	return name
+	
+
 
 begin(ssh)

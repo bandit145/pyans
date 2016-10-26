@@ -5,10 +5,11 @@ menu = '''
 [>]3.CHECK INVENTORY       [<]
 [>]4.EXIT                  [<]
          	'''
-server_pass=''
+server_pass=''#not in use currently
 username='phil'
 ans_server='ansible-ubuntu.meme.com'
 priv_key_file='puttyansible'
 ans_playbooklocation='/home/server/'
 monitoring_location='sensu.meme.com:4567'
 pkey_location='/home/phil/ansible_keys/anspriv'
+vcenter = 'vcenter.meme.com'
