@@ -4,7 +4,7 @@
 from config import pkey_location
 import getpass
 
-def server_deploy(ssh, ip, pcname): #for base server_deploy.yml playbook
+def server_deploy(ssh, pcname): #for base server_deploy.yml playbook
 	playbook = 'server_deploy.yml' #name of book on server
 	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
@@ -15,7 +15,7 @@ def server_deploy(ssh, ip, pcname): #for base server_deploy.yml playbook
 	for line in output:
 		print(line)
 
-def jenkins_server(ssh, ip, pcname): #for base jenkins_server.yml playbook
+def jenkins_server(ssh, pcname): #for base jenkins_server.yml playbook
 	playbook = 'jenkins_server.yml' #name of book on server
 	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')

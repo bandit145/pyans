@@ -9,6 +9,7 @@ import getpass
 import http.client
 import subprocess
 import time
+import os
 books = {#function names go here 
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux']
@@ -27,7 +28,7 @@ def begin(ssh):
 	print(menu)
 	choice = input('> ')
 	if choice == '1':
-		run_ans(ssh, content)
+		run_ans(ssh)
 	elif choice == '2':
 		list_plays(ssh)
 	elif choice == '3':
@@ -37,7 +38,7 @@ def begin(ssh):
 
 def run_ans(ssh): #going to become "deployment function"
 	try:
-		choice = raw_input('Enter playbook you would like to deploy > ')
+		choice = input('Enter playbook you would like to deploy > ')
 		name = new_vm(books[choice][1])
 		books[choice][0](ssh,name)
 		begin(ssh)
@@ -74,10 +75,14 @@ def ssh_connect(key):
 	login = 1
 	return ssh
 
-def new_vm():#keep ip address together with ansible
-	name = raw_input('Enter computer name > ')
-	template = raw_input('Enter template from vcenter > ')
-	subprocess.call(['./vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name])
+def new_vm(choice):#keep ip address together with ansible
+	if choice == 'linux':
+		template = 'debian-server'
+	elif choice == 'windows':
+		template = 'winserver2016'
+	name = input('Enter computer name > ')
+	subprocess.call(['powershell', 'Set-ExecutionPolicy Unrestricted'], shell=True)
+	subprocess.call(['powershell', './vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name], shell=True)
 	return name
 	
 

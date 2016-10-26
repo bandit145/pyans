@@ -8,7 +8,6 @@ param(
     [string]$vmname
 
     )
-
 $ram = New-Object System.Collections.ArrayList 
 $vmhost = @{}
 Import-Module VMWare.VimAutomation.Core
@@ -27,7 +26,9 @@ foreach($num in $ram){
     try{
         New-VM -VMHost $vmhost.$num -Template $template -Name $vmname | Wait-Task
         Start-VM -VM $vmname
-        Write-Host $vmname created on $vmhost.$num
+        Start-Sleep -s 20
+        $data = Get-VMGuest -VM $vmname
+        Write-Host $vmname ip address is $data.IPAddress
         exit
 
     }
