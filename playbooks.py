@@ -25,3 +25,15 @@ def jenkins_server(ssh, pcname): #for base jenkins_server.yml playbook
 	output = stdout.readlines()
 	for line in output:
 		print(line)
+
+def graylog_selfnode(ssh, pcname): #for base jenkins_server.yml playbook
+	playbook = 'graylog_selfnode.yml' #name of book on server
+	computer = input('Enter address of target > ')
+	password = getpass.getpass('Enter become pass > ')
+	graylog_pass = getpass.getpass('Enter Graylog root password > ')
+	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}, root_pass={rootpass}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location, rootpass=jenkins_pass))
+	stdin.write(password+'\n')
+	stdin.flush()
+	output = stdout.readlines()
+	for line in output:
+		print(line)

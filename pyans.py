@@ -12,7 +12,8 @@ import time
 import os
 books = {#function names go here 
 	'server_deploy': [server_deploy,'linux'],
-	'jenkins_server': [jenkins_server,'linux']
+	'jenkins_server': [jenkins_server,'linux'],
+	'graylog_selfnode':[graylog_selfnode,'linux']
 }
 
 
