@@ -12,6 +12,9 @@ def server_deploy(ssh, pcname): #for base server_deploy.yml playbook
 	stdin.write(password+'\n')
 	stdin.flush()
 	output = stdout.readlines()
+	error = stdout.readlines()
+	for line in error:
+		print(line)
 	for line in output:
 		print(line)
 
@@ -23,6 +26,9 @@ def jenkins_server(ssh, pcname): #for base jenkins_server.yml playbook
 	stdin.write(password+'\n')
 	stdin.flush()
 	output = stdout.readlines()
+	error = stdout.readlines()
+	for line in error:
+		print(line)
 	for line in output:
 		print(line)
 
@@ -31,9 +37,12 @@ def graylog_selfnode(ssh, pcname): #for base jenkins_server.yml playbook
 	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
 	graylog_pass = getpass.getpass('Enter Graylog root password > ')
-	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}, root_pass={rootpass}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location, rootpass=jenkins_pass))
+	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name} root_pass={rootpass}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location, rootpass=graylog_pass))
 	stdin.write(password+'\n')
 	stdin.flush()
 	output = stdout.readlines()
+	error = stdout.readlines()
+	for line in error:
+		print(line)
 	for line in output:
 		print(line)
