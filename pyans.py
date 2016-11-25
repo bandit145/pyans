@@ -13,7 +13,9 @@ import os
 books = {#function names go here 
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux'],
-	'graylog_selfnode':[graylog_selfnode,'linux']
+	'graylog_selfnode':[graylog_selfnode,'linux'],
+	'domain_con':[domain_con,'windows'],
+	'windows_common':[windows_common,'windows']
 }
 
 
@@ -61,7 +63,7 @@ def get_inventory(ssh): # connects to sensu and gets servers
 	sensu = http.client.HTTPConnection(monitoring_location)
 	sensu.request('GET','/clients')
 	clients = sensu.getresponse()
-	clients = json.loads(clients.readall().decode('utf-8'))
+	clients = json.loads(clients.read().decode('utf-8'))
 	for client in clients:
 		print(client['name']+' - '+ client['address'])
 	begin(ssh)
@@ -80,12 +82,10 @@ def new_vm(choice):#keep ip address together with ansible
 	if choice == 'linux':
 		template = 'debian-server'
 	elif choice == 'windows':
-		template = 'winserver2016'
+		template = 'winserver2012'
 	name = input('Enter computer name > ')
 	subprocess.call(['powershell', 'Set-ExecutionPolicy Unrestricted'], shell=True)
 	subprocess.call(['powershell', './vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name], shell=True)
 	return name
 	
-
-
 begin(ssh)
