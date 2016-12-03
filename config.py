@@ -7,7 +7,7 @@ menu = '''
          	'''
 server_pass=''#not in use currently
 username='phil'
-ans_server='ansible-ubuntu.meme.com'
+ans_server='192.168.1.14'
 priv_key_file='puttyansible'
 ans_playbooklocation='/home/server/'
 monitoring_location='sensu.meme.com:4567'
