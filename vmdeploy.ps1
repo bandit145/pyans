@@ -5,7 +5,11 @@ param(
     [parameter(Mandatory=$true)]
     [string]$template,
     [parameter(Mandatory=$true)]
-    [string]$vmname
+    [string]$vmname,
+    [parameter(Mandatory=$true)]
+    [string]$user,
+    [parameter(Mandatory=$true)]
+    [string]$paswd
 
     )
 $ram = New-Object System.Collections.ArrayList 
@@ -13,7 +17,7 @@ $vmhost = @{}
 Import-Module VMWare.VimAutomation.Core -ErrorAction "SilentlyContinue"
 Import-Module PowerCLI.ViCore -ErrorAction "SilentlyContinue"
 $credential = Get-Credential
-Connect-VIServer -Server $server -Credential $credential
+Connect-VIServer -Server $server -User $user -Password $paswd
 $hosts = Get-VMHost
 #make vmhost hash correspond to opem memeory and add open memeory to its own list
 foreach($box in $hosts){
