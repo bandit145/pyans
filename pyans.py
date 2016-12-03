@@ -23,7 +23,7 @@ books = {#function names go here
 login = 0
 pkey_pass = 0 
 ssh=0
-def begin():
+def begin(ssh):
 	if login == 0:
 		print('Initialize connection to Ansible server...')
 		pkey_pass= getpass.getpass('Enter pkey pass > ')
@@ -98,4 +98,4 @@ def new_vm(choice):#keep ip address together with ansible
 		print(output)
 	return name
 
-begin()
+begin(ssh)
