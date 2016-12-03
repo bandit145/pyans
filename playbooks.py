@@ -36,8 +36,43 @@ def graylog_selfnode(ssh, pcname): #for base jenkins_server.yml playbook
 	playbook = 'graylog_selfnode.yml' #name of book on server
 	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
-	graylog_pass = getpass.getpass('Enter Graylog root password > ')
-	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name} root_pass={rootpass}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location, rootpass=graylog_pass))
+	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
+	stdin.write(password+'\n')
+	stdin.flush()
+	output = stdout.readlines()
+	error = stdout.readlines()
+	for line in error:
+		print(line)
+	for line in output:
+		print(line)
+
+def domain_con(ssh, pcname): #for base jenkins_server.yml playbook
+	dapass='"'
+	playbook = 'domain_con.yml' #name of book on server
+	computer = input('Enter address of target > ')
+	password = getpass.getpass('Enter local admin pass > ')
+	domainadmin = input('Enter domain admin account > ')
+	dapass = dapass+getpass.getpass('Enter DA password > ')
+	dapass = dapass+'"'
+	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass))
+	stdin.write(password+'\n')
+	stdin.flush()
+	output = stdout.readlines()
+	error = stdout.readlines()
+	for line in error:
+		print(line)
+	for line in output:
+		print(line)
+
+def windows_common(ssh, pcname): #for base jenkins_server.yml playbook
+	dapass='"'
+	playbook = 'windows_common.yml' #name of book on server
+	computer = input('Enter address of target > ')
+	password = getpass.getpass('Enter local admin pass > ')
+	domainadmin = input('Enter domain admin account > ')
+	dapass = dapass+getpass.getpass('Enter DA password > ')
+	dapass = dapass+'"'
+	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass))
 	stdin.write(password+'\n')
 	stdin.flush()
 	output = stdout.readlines()
