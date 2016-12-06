@@ -4,9 +4,8 @@
 from config import pkey_location
 import getpass
 
-def server_deploy(ssh, pcname): #for base server_deploy.yml playbook
+def server_deploy(ssh, pcname , computer): #for base server_deploy.yml playbook
 	playbook = 'server_deploy.yml' #name of book on server
-	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	stdin.write(password+'\n')
@@ -18,9 +17,8 @@ def server_deploy(ssh, pcname): #for base server_deploy.yml playbook
 	for line in output:
 		print(line)
 
-def jenkins_server(ssh, pcname): #for base jenkins_server.yml playbook
+def jenkins_server(ssh, pcname, computer): #for base jenkins_server.yml playbook
 	playbook = 'jenkins_server.yml' #name of book on server
-	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	stdin.write(password+'\n')
@@ -32,9 +30,8 @@ def jenkins_server(ssh, pcname): #for base jenkins_server.yml playbook
 	for line in output:
 		print(line)
 
-def graylog_selfnode(ssh, pcname): #for base jenkins_server.yml playbook
+def graylog_selfnode(ssh, pcname, computer): #for base jenkins_server.yml playbook
 	playbook = 'graylog_selfnode.yml' #name of book on server
-	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter become pass > ')
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	stdin.write(password+'\n')
@@ -46,10 +43,9 @@ def graylog_selfnode(ssh, pcname): #for base jenkins_server.yml playbook
 	for line in output:
 		print(line)
 
-def domain_con(ssh, pcname): #for base jenkins_server.yml playbook
+def domain_con(ssh, pcname, computer): #for base jenkins_server.yml playbook
 	dapass='"'
 	playbook = 'domain_con.yml' #name of book on server
-	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter local admin pass > ')
 	domainadmin = input('Enter domain admin account > ')
 	dapass = dapass+getpass.getpass('Enter DA password > ')
@@ -64,10 +60,9 @@ def domain_con(ssh, pcname): #for base jenkins_server.yml playbook
 	for line in output:
 		print(line)
 
-def windows_common(ssh, pcname): #for base jenkins_server.yml playbook
+def windows_common(ssh, pcname, computer): #for base jenkins_server.yml playbook
 	dapass='"'
 	playbook = 'windows_common.yml' #name of book on server
-	computer = input('Enter address of target > ')
 	password = getpass.getpass('Enter local admin pass > ')
 	domainadmin = input('Enter domain admin account > ')
 	dapass = dapass+getpass.getpass('Enter DA password > ')

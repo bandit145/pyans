@@ -6,14 +6,19 @@ param(
     [string]$template,
     [parameter(Mandatory=$true)]
     [string]$vmname
+    [parameter(Mandatory=$true)]
+    [string]$user,
+    [parameter(Mandatory=$true)]
+    [string]$password
     )
+$paswd = ConvertTo-SecureString $password -AsPlainText -force
+$credential = New-Object System.Management.Automation.PSCredential($user,$paswd)
 #for hostname and loadvg
 $hostname = New-Object System.Collections.Specialized.OrderedDictionary
 #for the broken down cpu percentage and ram usage percentage
 $hostinfo = @{}
 Import-Module VMWare.VimAutomation.Core -ErrorAction "SilentlyContinue"
 Import-Module PowerCLI.ViCore -ErrorAction "SilentlyContinue"
-$credential = Get-Credential
 Connect-VIServer -Server $server -Credential $credential
 $hosts = Get-VMHost
 #make vmhost hash table correspond to open memeory and add open memeory to its own list
@@ -36,7 +41,9 @@ foreach($vmhost in $hostname.Keys){
             Write-Host "Creating "$vmname"...."
              Start-Sleep -sec 5}
         until(Get-VMGuest -VM $vmname)
-        Start-VM -VM $vmname -ErrorAction "SilentlyContinue"
+        #Out-Null so esxi host ip address is not picked up by regex
+        #Start-VM spits out info about the machine it started
+        Start-VM -VM $vmname | Out-Null
         do{
             Write-Host "Wating for "$vmname"s ip ...."
             Start-Sleep -sec 5

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #TODO: add error handling
-#Streamline pyans to be more autonomous, 
+#Streamline pyans to be more autonomous
 import paramiko
 from config import *
 from playbooks import *
@@ -11,6 +11,7 @@ import http.client
 import subprocess
 import time
 import os
+import re
 books = {#function names go here 
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux'],
@@ -23,28 +24,35 @@ books = {#function names go here
 login = 0
 pkey_pass = 0 
 ssh=0
+ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 def begin(ssh):
-	if login == 0:
-		print('Initialize connection to Ansible server...')
-		pkey_pass= getpass.getpass('Enter pkey pass > ')
-		key = paramiko.RSAKey(filename=priv_key_file, password=pkey_pass)
-		ssh = ssh_connect(key)
-	print(menu)
-	choice = input('> ')
-	if choice == '1':
-		run_ans(ssh)
-	elif choice == '2':
-		list_plays(ssh)
-	elif choice == '3':
-		get_inventory(ssh)
-	elif choice == '4':
+	try:
+		if login == 0:
+			print('Initialize connection to Ansible server...')
+			pkey_pass= getpass.getpass('Enter pkey pass > ')
+			key = paramiko.RSAKey(filename=priv_key_file, password=pkey_pass)
+			ssh = ssh_connect(key)
+		print(menu)
+		choice = input('> ')
+		if choice == '1':
+			run_ans(ssh)
+		elif choice == '2':
+			list_plays(ssh)
+		elif choice == '3':
+			get_inventory(ssh)
+		elif choice == '4':
+			sys.exit()
+	except paramiko.ssh_exception.SSHException:
+		print('[x] Password incorrect')
 		sys.exit()
+	except KeyboardInterrupt:
+		print('[x] Exiting...')
 
 def run_ans(ssh): #going to become "deployment function"
 	try:
 		choice = input('Enter playbook you would like to deploy > ')
-		name = new_vm(books[choice][1])
-		books[choice][0](ssh,name)
+		name, ip = new_vm(books[choice][1])
+		books[choice][0](ssh, name , ip)
 		begin(ssh)
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
@@ -87,15 +95,22 @@ def new_vm(choice):#keep ip address together with ansible
 	user = input('Enter username for vcenter > ')
 	paswd =  getpass.getpass('Enter password for vcenter > ')
 	name = input('Enter computer name > ')
-	if os.name == 'nt':
-		subprocess.call(['powershell', 'Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser'], shell=True)
-		subprocess.call(['powershell', './vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name], shell=True)
-	elif os.name == 'posix':
-		proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-		script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -paswd "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
-		output, err = proc.communicate(input=bytes(script,encoding='utf-8'))
-		output = output.decode()
-		print(output)
-	return name
+	#should be able to trash this
+	#if os.name == 'nt':
+	#	subprocess.call(['powershell', 'Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser'], shell=True)
+	#	subprocess.call(['powershell', './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)], shell=True)
+	#elif os.name == 'posix':
+	proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+	script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
+	output, err = proc.communicate(input=bytes(script,encoding='utf-8'))
+	print(output)
+	output = ipv4addr.search(output)
+	if output == True:
+		ip = output.group(1)
+	else:
+		print('[x] No ip address found for {name}'.format(name=name))
+		ip = input('[x] Enter ip address manually > ')
+
+	return name, ip
 
 begin(ssh)
