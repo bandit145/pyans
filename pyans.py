@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #TODO: add error handling
+#Streamline pyans to be more autonomous, 
 import paramiko
 from config import *
 from playbooks import *
@@ -83,9 +84,18 @@ def new_vm(choice):#keep ip address together with ansible
 		template = 'debian-server'
 	elif choice == 'windows':
 		template = 'winserver2012'
+	user = input('Enter username for vcenter > ')
+	paswd =  getpass.getpass('Enter password for vcenter > ')
 	name = input('Enter computer name > ')
-	subprocess.call(['powershell', 'Set-ExecutionPolicy Unrestricted'], shell=True)
-	subprocess.call(['powershell', './vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name], shell=True)
+	if os.name == 'nt':
+		subprocess.call(['powershell', 'Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser'], shell=True)
+		subprocess.call(['powershell', './vmdeploy.ps1','-server '+vcenter,'-template '+template,'-vmname '+name], shell=True)
+	elif os.name == 'posix':
+		proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+		script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -paswd "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
+		output, err = proc.communicate(input=bytes(script,encoding='utf-8'))
+		output = output.decode()
+		print(output)
 	return name
-	
+
 begin(ssh)
