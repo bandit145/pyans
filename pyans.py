@@ -12,6 +12,7 @@ import subprocess
 import time
 import os
 import re
+import logging
 books = {#function names go here 
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux'],
@@ -25,6 +26,7 @@ login = 0
 pkey_pass = 0 
 ssh=0
 ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
+logging.basicConfig(level=logging.DEBUG)
 def begin(ssh):
 	try:
 		if login == 0:
@@ -47,7 +49,6 @@ def begin(ssh):
 		sys.exit()
 	except KeyboardInterrupt:
 		print('[x] Exiting...')
-
 def run_ans(ssh): #going to become "deployment function"
 	try:
 		choice = input('Enter playbook you would like to deploy > ')
@@ -89,28 +90,26 @@ def ssh_connect(key):
 
 def new_vm(choice):#keep ip address together with ansible
 	if choice == 'linux':
-		template = 'debian-server'
+		template = linux_template
 	elif choice == 'windows':
-		template = 'winserver2012'
+		template = windows_template
 	user = input('Enter username for vcenter > ')
 	paswd =  getpass.getpass('Enter password for vcenter > ')
 	name = input('Enter computer name > ')
-	#should be able to trash this
-	#if os.name == 'nt':
-	#	subprocess.call(['powershell', 'Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser'], shell=True)
-	#	subprocess.call(['powershell', './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)], shell=True)
-	#elif os.name == 'posix':
 	proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
-	output, err = proc.communicate(input=bytes(script,encoding='utf-8'))
-	print(output)
+	output, err = proc.communicate(input=bytes(script+"\n",encoding='utf-8'))
+	output = str(output)
+	if "incorrect" in output:
+		print('[x] Incorrect user name or password, restarting...')
+		begin(ssh)
 	output = ipv4addr.search(output)
-	if output == True:
-		ip = output.group(1)
+	logging.debug(output.group())
+	if output:
+		ip = output.group()
 	else:
 		print('[x] No ip address found for {name}'.format(name=name))
 		ip = input('[x] Enter ip address manually > ')
-
 	return name, ip
 
 begin(ssh)

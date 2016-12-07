@@ -5,7 +5,7 @@ param(
     [parameter(Mandatory=$true)]
     [string]$template,
     [parameter(Mandatory=$true)]
-    [string]$vmname
+    [string]$vmname,
     [parameter(Mandatory=$true)]
     [string]$user,
     [parameter(Mandatory=$true)]
@@ -35,7 +35,7 @@ $hostname = $hostname | Sort-Object -Property Value -Descending #sort hostname h
 #loop through ram arraylist and try to deploy to hosts
 foreach($vmhost in $hostname.Keys){
     if($hostinfo.$vmhost.cpuper -lt .80 -Or $hostinfo.$vmhost.ramper -lt .75){ 
-        New-VM -VMHost $vmhost -Template $template -Name $vmname  
+        New-VM -VMHost $vmhost -Template $template -Name $vmname  | Out-Null
         #do until stopgap since it seems wait-task is broken in newest powercli 6.5
         do{
             Write-Host "Creating "$vmname"...."
