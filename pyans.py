@@ -26,7 +26,7 @@ login = 0
 pkey_pass = 0 
 ssh=0
 ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 def begin(ssh):
 	try:
 		if login == 0:
