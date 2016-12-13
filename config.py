@@ -1,9 +1,10 @@
 menu = '''
 [>] WELCOME TO THE HOMELAB [<]
-[>]1.RUN ANSIBLE PLAYBOOK  [<] 
+[>]1.DEPLOY MACHINE        [<] 
 [>]2.LIST ANSIBLE PLAYBOOKS[<]
 [>]3.CHECK INVENTORY       [<]
-[>]4.EXIT                  [<]
+[>]4.RUN PLAYBOOK          [<]
+[>]5.EXIT                  [<]
          	'''
 server_pass=''#not in use currently
 username='phil'

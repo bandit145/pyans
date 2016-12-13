@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#TODO: add error handling
 #Streamline pyans to be more autonomous
 import paramiko
 from config import *
@@ -26,7 +25,7 @@ login = 0
 pkey_pass = 0 
 ssh=0
 ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.CRITICAL)
 def begin(ssh):
 	try:
 		if login == 0:
@@ -37,24 +36,33 @@ def begin(ssh):
 		print(menu)
 		choice = input('> ')
 		if choice == '1':
-			run_ans(ssh)
+			run_ans(ssh,choice)
 		elif choice == '2':
 			list_plays(ssh)
 		elif choice == '3':
 			get_inventory(ssh)
 		elif choice == '4':
+			run_ans(ssh,choice)
+		elif choice == '5':
 			sys.exit()
 	except paramiko.ssh_exception.SSHException:
 		print('[x] Password incorrect')
 		sys.exit()
 	except KeyboardInterrupt:
 		print('[x] Exiting...')
-def run_ans(ssh): #going to become "deployment function"
+def run_ans(ssh, choice): #going to become "deployment function"
 	try:
-		choice = input('Enter playbook you would like to deploy > ')
-		name, ip = new_vm(books[choice][1])
-		books[choice][0](ssh, name , ip)
-		begin(ssh)
+		playbook = input('Enter playbook you would like to deploy > ')
+		if choice == '1':
+			name, ip = new_vm(books[playbook][1])
+			books[playbook][0](ssh, name ,ip)
+			begin(ssh)
+		elif choice == '4':
+			name = input('Enter Computer Name > ')
+			ip = input('Enter ip of machine > ')
+			books[playbook][0](ssh, name ,ip)
+			begin(ssh)
+
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
 	except paramiko.AuthenticationException:
@@ -96,16 +104,17 @@ def new_vm(choice):#keep ip address together with ansible
 	user = input('Enter username for vcenter > ')
 	paswd =  getpass.getpass('Enter password for vcenter > ')
 	name = input('Enter computer name > ')
+	folder = input('Enter Folder name for vm > ')
 	proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
+	script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}" -folder "{folder}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd, folder=folder)
 	output, err = proc.communicate(input=bytes(script+"\n",encoding='utf-8'))
 	output = str(output)
 	if "incorrect" in output:
 		print('[x] Incorrect user name or password, restarting...')
 		begin(ssh)
 	output = ipv4addr.search(output)
-	logging.debug(output.group())
 	if output:
+		logging.debug(output.group())
 		ip = output.group()
 	else:
 		print('[x] No ip address found for {name}'.format(name=name))
