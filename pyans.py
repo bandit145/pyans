@@ -20,7 +20,7 @@ books = {#function names go here
 	'windows_common':[windows_common,'windows']
 }
 
-
+#globals pls
 login = 0
 pkey_pass = 0 
 ssh=0
@@ -55,7 +55,7 @@ def run_ans(ssh, choice): #going to become "deployment function"
 		playbook = input('Enter playbook you would like to deploy > ')
 		if choice == '1':
 			name, ip = new_vm(books[playbook][1])
-			books[playbook][0](ssh, name ,ip)
+			books[playbook][0](ssh, name ,ip, playbook)
 			begin(ssh)
 		elif choice == '4':
 			name = input('Enter Computer Name > ')
