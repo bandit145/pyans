@@ -38,7 +38,7 @@ $hostname = $hostname | Sort-Object -Property Value -Descending #sort hostname h
 foreach($vmhost in $hostname.Keys){
     if($hostinfo.$vmhost.cpuper -lt .80 -Or $hostinfo.$vmhost.ramper -lt .75){ 
         New-VM -VMHost $vmhost -Template $template -Name $vmname  | Out-Null
-        if($folder in $folders.name){
+        if($folders.name -Contains $folder){
             Move-VM -VM $vmname -Destination $folder | Out-Null
         }
         #do until stopgap since it seems wait-task is broken in newest powercli 6.5

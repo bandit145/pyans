@@ -113,7 +113,10 @@ def new_vm(choice):#keep ip address together with ansible
 	name = input('Enter computer name > ')
 	folder = input('Enter Folder name for vm > ')
 	proc = subprocess.Popen('powershell', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}" -folder "{folder}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd, folder=folder)
+	if folder == '':
+		script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd)
+	else:
+		script = './vmdeploy.ps1 -server {vcenter} -template {template} -vmname {name} -user {user} -password "{paswd}" -folder "{folder}"'.format(vcenter=vcenter, template=template, name=name, user=user, paswd=paswd, folder=folder)
 	output, err = proc.communicate(input=bytes(script+"\n",encoding='utf-8'))
 	output = str(output)
 	if "incorrect" in output:
