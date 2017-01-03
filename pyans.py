@@ -12,12 +12,13 @@ import time
 import os
 import re
 import logging
-books = {#function names go here 
+books = {#function names go here  along with os type
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux'],
 	'graylog_selfnode':[graylog_selfnode,'linux'],
 	'domain_con':[domain_con,'windows'],
-	'windows_common':[windows_common,'windows']
+	'windows_common':[windows_common,'windows'],
+	'jenkins_node':[jenkins_node,'linux']
 }
 
 #globals pls
@@ -26,7 +27,8 @@ pkey_pass = 0
 ssh=0
 ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 logging.basicConfig(level=logging.CRITICAL)
-def begin(ssh):
+def begin():
+	global ssh
 	try:
 		if login == 0:
 			print('Initialize connection to Ansible server...')
@@ -36,13 +38,16 @@ def begin(ssh):
 		print(menu)
 		choice = input('> ')
 		if choice == '1':
-			run_ans(ssh,choice)
+			run_ans(choice)
 		elif choice == '2':
-			list_plays(ssh)
+			plays = list_plays()
+			print(plays)
+			begin()
 		elif choice == '3':
-			get_inventory(ssh)
+			get_inventory()
+			begin()
 		elif choice == '4':
-			run_ans(ssh,choice)
+			run_ans(choice)
 		elif choice == '5':
 			sys.exit()
 	except paramiko.ssh_exception.SSHException:
@@ -50,7 +55,7 @@ def begin(ssh):
 		sys.exit()
 	except KeyboardInterrupt:
 		print('[x] Exiting...')
-def run_ans(ssh, choice): #going to become "deployment function"
+def run_ans(choice): #going to become "deployment function"
 	try:
 		playbook = input('Enter playbook you would like to deploy > ')
 		if choice == '1':
@@ -60,8 +65,8 @@ def run_ans(ssh, choice): #going to become "deployment function"
 		elif choice == '4':
 			name = input('Enter Computer Name > ')
 			ip = input('Enter ip of machine > ')
-			books[playbook][0](ssh, name ,ip)
-			begin(ssh)
+			books[playbook][0](ssh, name ,ip, playbook)
+			begin()
 
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
@@ -69,12 +74,12 @@ def run_ans(ssh, choice): #going to become "deployment function"
 		print('Auth Error...')
 	except KeyError:
 		print('No playbook by that name...')
-		begin(ssh)
+		begin()
 
-def list_plays(ssh): #lists plays
+def list_plays(): #lists plays
 	stdin, stdout, stderr = ssh.exec_command('ls *.yml *.yaml')
-	print(stdout.readlines())
-	begin(ssh)
+	plays = stdout.readlines()
+	return plays
 
 
 def get_inventory(ssh): # connects to sensu and gets servers
@@ -84,7 +89,7 @@ def get_inventory(ssh): # connects to sensu and gets servers
 	clients = json.loads(clients.read().decode('utf-8'))
 	for client in clients:
 		print(client['name']+' - '+ client['address'])
-	begin(ssh)
+	begin()
 
 
 def ssh_connect(key):
@@ -114,7 +119,7 @@ def new_vm(choice):#keep ip address together with ansible
 	output = str(output)
 	if "incorrect" in output:
 		print('[x] Incorrect user name or password, restarting...')
-		begin(ssh)
+		begin()
 	output = ipv4addr.search(output)
 	if output:
 		logging.debug(output.group())
@@ -124,4 +129,4 @@ def new_vm(choice):#keep ip address together with ansible
 		ip = input('[x] Enter ip address manually > ')
 	return name, ip
 
-begin(ssh)
+begin()
