@@ -4,7 +4,8 @@ menu = '''
 [>]2.LIST ANSIBLE PLAYBOOKS[<]
 [>]3.CHECK INVENTORY       [<]
 [>]4.RUN PLAYBOOK          [<]
-[>]5.EXIT                  [<]
+[>]5.RUN PLAYBOOK OS WIDE  [<]
+[>]6.EXIT                  [<]
          	'''
 server_pass=''#not in use currently
 username='phil'

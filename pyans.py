@@ -49,6 +49,8 @@ def begin():
 		elif choice == '4':
 			run_ans(choice)
 		elif choice == '5':
+			run_ans(ssh,choice)
+		elif choice == '6':
 			sys.exit()
 	except paramiko.ssh_exception.SSHException:
 		print('[x] Password incorrect')
@@ -67,6 +69,13 @@ def run_ans(choice): #going to become "deployment function"
 			ip = input('Enter ip of machine > ')
 			books[playbook][0](ssh, name ,ip, playbook)
 			begin()
+
+		elif choice == '5':
+			ostyp = input('Enter os type to deploy accross > ')
+			machines = get_type(ostype)
+			for machine in machines:
+				books[playbook][0](ssh,machine['name'],machine['ip'],playbook)
+
 
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
@@ -129,4 +138,18 @@ def new_vm(choice):#keep ip address together with ansible
 		ip = input('[x] Enter ip address manually > ')
 	return name, ip
 
+
+def get_type(ostype): #creats a list of machines by os type in sensu subscriptions
+	machines = []
+	sensu = http.client.HTTPConnection(monitoring_location)
+	sensu.request('GET','/clients')
+	clients = sensu.getresponse()
+	clients = json.loads(clients.read().decode('utf-8'))
+	for client in clients:
+		if ostype in client['subscriptions']:
+			machines.append({'ip':client['address'],'name':client['name']})
+	return machines
+
 begin()
+
+
