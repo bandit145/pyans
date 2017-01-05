@@ -49,7 +49,7 @@ def begin():
 		elif choice == '4':
 			run_ans(choice)
 		elif choice == '5':
-			run_ans(ssh,choice)
+			run_ans(choice)
 		elif choice == '6':
 			sys.exit()
 	except paramiko.ssh_exception.SSHException:
@@ -71,10 +71,11 @@ def run_ans(choice): #going to become "deployment function"
 			begin()
 
 		elif choice == '5':
-			ostyp = input('Enter os type to deploy accross > ')
+			ostype = input('Enter os type to deploy accross > ')
 			machines = get_type(ostype)
+			password = getpass.getpass('Enter password for machines > ')
 			for machine in machines:
-				books[playbook][0](ssh,machine['name'],machine['ip'],playbook)
+				books[playbook][0](ssh,machine['name'],machine['ip'],playbook, password)
 
 
 	except paramiko.SSHException:

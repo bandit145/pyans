@@ -15,9 +15,12 @@ def password_read(password, stdout, stderr, stdin):
 	for line in output:
 		print(line)
 #Base linux playbook info
-def linux_base(playbook):
+def linux_base(playbook, *args):
 	playbook = playbook+'.yml' #name of book on server
-	password = getpass.getpass('Enter become pass > ')
+	if len(args) == 1:
+		password = args[0]
+	else:
+		password = getpass.getpass('Enter become pass > ')
 	return password, playbook
 
 def windows_base(playbook):
@@ -31,32 +34,32 @@ def windows_base(playbook):
 	
 
 #######PLAYBOOK RUNNING FUNCTIONS########
-def server_deploy(ssh, pcname , computer, playbook): #for base server_deploy.yml playbook
-	password,playbook = linux_base(playbook)
+def server_deploy(ssh, pcname , computer, playbook, *args): #for base server_deploy.yml playbook
+	password,playbook = linux_base(playbook, args[0])
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	password_read(password, stdout, stderr, stdin)
 
-def jenkins_server(ssh, pcname, computer, playbook): #for base jenkins_server.yml playbook
-	password, playbook = linux_base(playbook)
+def jenkins_server(ssh, pcname, computer, playbook, *args): #for base jenkins_server.yml playbook
+	password, playbook = linux_base(playbook,args[0])
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	password_read(password, stdout, stderr, stdin)
 
-def jenkins_node(ssh,pcname,computer,playbook):
-	password, playbook = linux_base(playbook)
+def jenkins_node(ssh,pcname,computer,playbook, *args):
+	password, playbook = linux_base(playbook, args[0])
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	password_read(password, stdout, stderr, stdin)
 	
-def graylog_selfnode(ssh, pcname, computer, playbook): #for base jenkins_server.yml playbook
-	passsword, playbook = linux_base(playbook)
+def graylog_selfnode(ssh, pcname, computer, playbook, *args): #for base jenkins_server.yml playbook
+	passsword, playbook = linux_base(playbook, args[0])
 	stdin, stdout, stderr= ssh.exec_command('ansible-playbook {playbook} -i {hosts}, --extra-vars "host_name={name}" --ask-become-pass --private-key {pkey}'.format(playbook=playbook, hosts=computer, name=pcname, pkey=pkey_location))
 	password_read(password, stdout, stderr, stdin)
 
-def domain_con(ssh, pcname, computer, playbook): #for base jenkins_server.yml playbook
+def domain_con(ssh, pcname, computer, playbook, *args): #for base jenkins_server.yml playbook
 	password, playbook, domainadmin, dapass = windows_base(playbook)
 	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass))
 	password_read(password, stdout, stderr, stdin)
 
-def windows_common(ssh, pcname, computer, playbook): #for base jenkins_server.yml playbook
+def windows_common(ssh, pcname, computer, playbook, *args): #for base jenkins_server.yml playbook
 	password, playbook, domainadmin, dapass = windows_base(playbook)
 	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass))
 	password_read(password, stdout, stderr, stdin)
