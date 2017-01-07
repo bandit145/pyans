@@ -11,7 +11,6 @@ import subprocess
 import time
 import os
 import re
-import logging
 books = {#function names go here  along with os type
 	'server_deploy': [server_deploy,'linux'],
 	'jenkins_server': [jenkins_server,'linux'],
@@ -22,19 +21,18 @@ books = {#function names go here  along with os type
 }
 
 #globals pls
-login = 0
-pkey_pass = 0 
+pkey_pass = ''
 ssh=0
 ipv4addr = re.compile("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-logging.basicConfig(level=logging.CRITICAL)
 def begin():
+	global pkey_pass
 	global ssh
 	try:
-		if login == 0:
+		if pkey_pass == '':
 			print('Initialize connection to Ansible server...')
 			pkey_pass= getpass.getpass('Enter pkey pass > ')
-			key = paramiko.RSAKey(filename=priv_key_file, password=pkey_pass)
-			ssh = ssh_connect(key)
+		key = paramiko.RSAKey(filename=priv_key_file, password=pkey_pass)
+		ssh = ssh_connect(key)
 		print(menu)
 		choice = input('> ')
 		if choice == '1':
@@ -73,10 +71,10 @@ def run_ans(choice): #going to become "deployment function"
 		elif choice == '5':
 			ostype = input('Enter os type to deploy accross > ')
 			machines = get_type(ostype)
-			password = getpass.getpass('Enter password for machines > ')
+			password = getpass.getpass('Enter password for machines > ')#fix all this nonsense, can probably handle this with checking os type
 			for machine in machines:
 				books[playbook][0](ssh,machine['name'],machine['ip'],playbook, password)
-
+			begin()
 
 	except paramiko.SSHException:
 		print('Error Establishing connection...')
@@ -103,12 +101,10 @@ def get_inventory(ssh): # connects to sensu and gets servers
 
 
 def ssh_connect(key):
-	global login
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	ssh.connect(ans_server,username=username, pkey=key)
 	#user becomes logged in
-	login = 1
 	return ssh
 
 def new_vm(choice):#keep ip address together with ansible
@@ -132,7 +128,6 @@ def new_vm(choice):#keep ip address together with ansible
 		begin()
 	output = ipv4addr.search(output)
 	if output:
-		logging.debug(output.group())
 		ip = output.group()
 	else:
 		print('[x] No ip address found for {name}'.format(name=name))
