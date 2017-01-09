@@ -72,8 +72,7 @@ def run_ans(choice): #going to become "deployment function"
 			ostype = input('Enter os type to deploy accross > ')
 			machines = get_type(ostype)
 			password = getpass.getpass('Enter password for machines > ')#fix all this nonsense, can probably handle this with checking os type
-			for machine in machines:
-				books[playbook][0](ssh,machine['name'],machine['ip'],playbook, password)
+			books[playbook][0](ssh,'',machine,playbook, password)
 			begin()
 
 	except paramiko.SSHException:
@@ -136,14 +135,14 @@ def new_vm(choice):#keep ip address together with ansible
 
 
 def get_type(ostype): #creats a list of machines by os type in sensu subscriptions
-	machines = []
+	machines = ''
 	sensu = http.client.HTTPConnection(monitoring_location)
 	sensu.request('GET','/clients')
 	clients = sensu.getresponse()
 	clients = json.loads(clients.read().decode('utf-8'))
 	for client in clients:
 		if ostype in client['subscriptions']:
-			machines.append({'ip':client['address'],'name':client['name']})
+			machines += client['address']+','
 	return machines
 
 begin()
