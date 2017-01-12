@@ -17,7 +17,8 @@ books = {#function names go here  along with os type
 	'graylog_selfnode':[graylog_selfnode,'linux'],
 	'domain_con':[domain_con,'windows'],
 	'windows_common':[windows_common,'windows'],
-	'jenkins_node':[jenkins_node,'linux']
+	'jenkins_node':[jenkins_node,'linux'],
+	'sensu_server':[sensu_server,'linux']
 }
 
 #globals pls
@@ -61,7 +62,7 @@ def run_ans(choice): #going to become "deployment function"
 		if choice == '1':
 			name, ip = new_vm(books[playbook][1])
 			books[playbook][0](ssh, name ,ip, playbook)
-			begin(ssh)
+			begin()
 		elif choice == '4':
 			name = input('Enter Computer Name > ')
 			ip = input('Enter ip of machine > ')
@@ -72,7 +73,7 @@ def run_ans(choice): #going to become "deployment function"
 			ostype = input('Enter os type to deploy accross > ')
 			machines = get_type(ostype)
 			password = getpass.getpass('Enter password for machines > ')#fix all this nonsense, can probably handle this with checking os type
-			books[playbook][0](ssh,'',machine,playbook, password)
+			books[playbook][0](ssh,'',machines,playbook, password)
 			begin()
 
 	except paramiko.SSHException:
