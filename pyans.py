@@ -61,9 +61,11 @@ def run_ans(choice): #going to become "deployment function"
 		playbook = input('Enter playbook you would like to deploy > ')
 		if choice == '1':
 			name, ip = new_vm(books[playbook][1])
-			books[playbook][0](ssh, name ,ip, playbook)
+			#will change linux server admins to "Administrator local sudo access account"
+			books[playbook][0](ssh, name ,ip, playbook,local_admin )
 			begin()
 		elif choice == '4':
+			#run with local admin here
 			name = input('Enter Computer Name > ')
 			ip = input('Enter ip of machine > ')
 			books[playbook][0](ssh, name ,ip, playbook)
@@ -72,8 +74,7 @@ def run_ans(choice): #going to become "deployment function"
 		elif choice == '5':
 			ostype = input('Enter os type to deploy accross > ')
 			machines = get_type(ostype)
-			password = getpass.getpass('Enter password for machines > ')#fix all this nonsense, can probably handle this with checking os type
-			books[playbook][0](ssh,'',machines,playbook, password)
+			books[playbook][0](ssh,'',machines,playbook, automation_admin)
 			begin()
 
 	except paramiko.SSHException:
