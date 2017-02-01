@@ -55,8 +55,7 @@ def begin():
 	except paramiko.ssh_exception.SSHException:
 		print('[x] Password incorrect')
 		sys.exit()
-	except KeyboardInterrupt:
-		print('[x] Exiting...')
+
 def run_ans(choice): #going to become "deployment function"
 	try:
 		playbook = input('Enter playbook you would like to deploy > ')
@@ -148,6 +147,11 @@ def get_type(ostype): #creats a list of machines by os type in sensu subscriptio
 			machines += client['address']+','
 	return machines
 
-begin()
+
+try:
+	begin()
+
+except KeyboardInterrupt:
+		print('\n[x] Exiting...')
 
 
