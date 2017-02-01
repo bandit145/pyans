@@ -18,7 +18,8 @@ books = {#function names go here  along with os type
 	'domain_con':[domain_con,'windows'],
 	'windows_common':[windows_common,'windows'],
 	'jenkins_node':[jenkins_node,'linux'],
-	'sensu_server':[sensu_server,'linux']
+	'sensu_server':[sensu_server,'linux'],
+	'scheduled_windows':[scheduled_windows,'windows']
 }
 
 #globals pls
@@ -68,7 +69,7 @@ def run_ans(choice): #going to become "deployment function"
 			#run with local admin here
 			name = input('Enter Computer Name > ')
 			ip = input('Enter ip of machine > ')
-			books[playbook][0](ssh, name ,ip, playbook)
+			books[playbook][0](ssh, name ,ip, playbook, local_admin)
 			begin()
 
 		elif choice == '5':

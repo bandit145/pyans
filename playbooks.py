@@ -61,6 +61,12 @@ def windows_common(ssh, pcname, computer, playbook, admin): #for base jenkins_se
 	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass} remote_user={admin}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass, admin=admin))
 	password_read(password, stdout, stderr, stdin)
 
+def scheduled_windows(ssh, pcname, computer, playbook, admin): #for base jenkins_server.yml playbook
+	password, playbook, domainadmin, dapass = windows_base(playbook)
+	stdin, stdout, stderr= ssh.exec_command("ansible-playbook {playbook} -i {hosts}, --extra-vars 'name={name} winadmin={user} password={loginpass} remote_user={admin}' --ask-pass --connection=winrm -e ansible_winrm_server_cert_validation=ignore".format(playbook=playbook,hosts=computer, name=pcname, user=domainadmin, loginpass=dapass, admin=admin))
+	password_read(password, stdout, stderr, stdin)
+
+
 def sensu_server(ssh, pcname , computer, playbook, admin): #for base sensu_server.yml playbook
 	password,playbook = linux_base(playbook)
 	dash_pass = getpass.getpass('Enter uchiwa dashboard password > ')
